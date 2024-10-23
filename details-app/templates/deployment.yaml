@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:latest
+          env:
+          - name: POSTGRES_USER
+            value: {{ .Values.app.env.POSTGRES_USER }}
+          - name: POSTGRES_PASSWORD
+            value: {{ .Values.app.env.POSTGRES_PASSWORD }}
+          command: ['sh', '-c', 'until pg_isready -h postgres-container  -p 5432 -U $POSTGRES_USER; do echo waiting for postgres; sleep 5; done']
+
+      containers:
+      - name: {{ .Values.app.name }}
+        image: {{ .Values.app.image }}
+        ports:
+        - containerPort: {{ .Values.service.appPort }}
+        env:
+        - name: POSTGRES_USER
+          value: {{ .Values.app.env.POSTGRES_USER }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.app.env.POSTGRES_PASSWORD }}
+        # - name: DBHOST
+        #   value: {{ .Values.app.env.DBHOST }}
+        - name: DBNAME
+          value: {{ .Values.app.env.DBNAME }}
+        - name: SECRET_KEY
+          value: {{ .Values.app.env.SECRET_KEY }}
+

@@ -1,0 +1,31 @@
+app:
+  name: details-app
+  image: nimrodfixel/details-app:0.0.2
+  replicaCount: 2
+  env:
+    POSTGRES_USER: pgadmin
+    POSTGRES_PASSWORD: pgadmin
+    # DBHOST: postgres-container
+    DBNAME: postgres
+    SECRET_KEY: bKw%TW6XqRaHgTHnQ6*ZCYfwwQY1jG
+
+postgresql:
+  image: postgres:latest
+  replicaCount: 1
+  env:
+    POSTGRES_DB: postgres
+    POSTGRES_USER: pgadmin
+    POSTGRES_PASSWORD: pgadmin
+  port: 5432
+  storage:
+    size: 1Gi
+    accessMode: ReadWriteOnce
+
+service:
+  type: ClusterIP
+  appPort: 8123
+  dbPort: 5432
+
+ingress:
+  enabled: true
+  hostname: details-app.local

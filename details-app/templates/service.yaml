@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.app.name }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: {{ .Values.app.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.appPort }} # Change this to 8123
+      targetPort: {{ .Values.service.appPort }} # Change this to 8123
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-container
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: {{ .Values.postgresql.port }}
